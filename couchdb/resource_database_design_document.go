@@ -114,7 +114,15 @@ func resourceDesignDocumentRead(d *schema.ResourceData, m interface{}) error {
 	doc := couchdb.DesignDocument{}
 	err := db.Get(context.Background(), d.Id(), &doc)
 	if err != nil {
-		return err
+		// try to access the db. If it works, assume the design document does not exist
+		_, err2 := couch.Databases.Exists(db.Name)
+		if err2 != nil {
+			// return the original error
+			return err
+		}
+		// assume the document (or the DB) do not exist
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("language", doc.Language)

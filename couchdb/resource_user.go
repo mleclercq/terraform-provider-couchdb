@@ -62,7 +62,14 @@ func resourceUserRead(d *schema.ResourceData, m interface{}) error {
 
 	user, err := couch.Users.Get(context.Background(), d.Id())
 	if err != nil {
-		return err
+		// try to access the user db. If it works, assume the user does not exist
+		_, err2 := couch.Databases.Exists(couchdb.UsersDatabase)
+		if err2 != nil {
+			// return the original error
+			return err
+		}
+		d.SetId("")
+		return nil
 	}
 	d.Set("revision", user.Rev)
 	d.Set("roles", user.Roles)

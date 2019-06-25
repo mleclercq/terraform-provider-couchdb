@@ -195,7 +195,16 @@ func resourceDatabaseRead(d *schema.ResourceData, m interface{}) error {
 
 	meta, err := couch.Databases.Meta(d.Id())
 	if err != nil {
-		return err
+		exists, err2 := couch.Databases.Exists(d.Id())
+		if err2 != nil {
+			return err2
+		}
+		if exists {
+			return err
+		}
+		// Database no longer exists
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("document_count", strconv.Itoa(meta.DocumentCount))

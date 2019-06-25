@@ -2,7 +2,6 @@ package couchdb
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	couchdb "github.com/nicolai86/couchdb-go"
@@ -66,7 +65,7 @@ func resourceAdminUserRead(d *schema.ResourceData, m interface{}) error {
 		exists = exists || name == d.Id()
 	}
 	if !exists {
-		return fmt.Errorf("Admin %s was not found", d.Id())
+		d.SetId("")
 	}
 
 	return nil
